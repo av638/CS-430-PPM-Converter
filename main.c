@@ -1,15 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+typedef struct Pixmap // This will serve as my buffer
+{
+    unsigned char r, g, b;
 
-int pSixtoPThree(char* inputFile)
+} Pixmap;
+    Pixmap *pixmapSix;
+
+int pSixtoPThree(char* inputFile, char* outputFile)
 {
     FILE *source, *destination;
-    int height, width, depth,i;
-    long length;
-    unsigned char red, green, blue;
-    char *buffer;
+    char magicNumber[3];
+        unsigned char r, g, b;
+
+    int width, height, depth;
+    int i, j, counter;
 
     source = fopen (inputFile, "rb");
+    destination = fopen("output.ppm", "w+");
 
     if(source == NULL)
     {
@@ -18,38 +26,49 @@ int pSixtoPThree(char* inputFile)
     }
 
 
-    fseek( source , 0L , SEEK_END);
-    length = ftell( source );
-    rewind( source );
-
-    /* allocate memory for entire content */
-    buffer = calloc( 1, length+1 );
-    if( !buffer )
+    fscanf(source, "%s", magicNumber);
+    if (strcmp(magicNumber, "P6") != 0)
     {
-      fclose(source);
-      fprintf(stderr,"memory alloc fails");
-      return 1;
+        fprintf(stderr, "This is not in the correct P6 format!");
+        return -1;
     }
 
-    /* copy the image into the buffer */
-    if( 1!=fread( buffer , length, 1 , source) )
+    fscanf(src, "\n%d %d\n%d\n", &width, &height, &depth);
+    //pixmapSix = malloc(sizeof(Pixmap)* width * height);
+
+
+    fprintf(destination, "P3\n");
+    fprintf(destination, "#P3 converted from P6\n");
+    fprintf(destination, "%d %d\n%d\n", width, height, depth);
+
+    for (i = 0; i < width*height; i++)
     {
-        fclose(source);
-        free(buffer);
-        fprintf(stderr,"entire read fails");
-        return 1;
+
+        for (j = 0;  j < 3; j++)
+        {
+            fread(&r, 1, 1, source);
+            fread(&g, 1, 1, source);
+            fread(&b, 1, 1, source);
+        }
+
+        for (j = 0;  j < 3; j++)
+            fprintf(destination, "%d %d %d ", r, g, b);
+
+        if (counter == width)
+        {
+            fprintf(destination, "\n");
+            counter = 1;
+        }
+
+        else
+            counter++;
     }
 
-    for( i = 0; i < 50; i++)
-    {
-         printf("\nbuffer[%d] == %c", i, buffer[i]);
-    }
-    //printf("buffer = %s\n", buffer);
 
-    /* Mess with the buffer to convert the P6 to P3 format */
+   /* Mess with the buffer to convert the P6 to P3 format */
 
     fclose(source);
-    free(buffer);
+    fclose(destination);
     printf("\nConversion Finished");
     return 0;
 }
@@ -59,7 +78,7 @@ int main(int argc, char *argv[])
     if (argv[1] = 6)
     {
         printf("Converting starting...");
-        pSixtoPThree(argv[2]);
+        pSixtoPThree(argv[2], argv[3]);
     }
 
     //printf("\nConverting complete...\n");
