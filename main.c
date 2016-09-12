@@ -10,13 +10,13 @@ typedef struct Pixmap // This will serve as my buffer
 
 
 
-int ppmConverter(char* inputFile, char* outputFile, int desiredFormat)
+int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
 {
     FILE *source;
     int magicNumber;
     char c;
     int width, height, maxColor;
-    int i, j, size, totalItemsRead, *pixel;
+    int i, j, size, totalItemsRead;
 
     //Create a buffer for the pixmap image
     Pixmap *buffer = (Pixmap *)malloc(sizeof(Pixmap));
@@ -103,19 +103,22 @@ int ppmConverter(char* inputFile, char* outputFile, int desiredFormat)
     }
     // If its in ascii
     else if(magicNumber == 3)
-    {
+    { int pixel;
         for(i=0;i<height;i++)
         {
             for(j=0;j<width;j++)
             {
-                fscanf(source, "%d ", pixel);
-                buffer[i*width*3+3*j].image = *pixel;
 
-                fscanf(source, "%d ",pixel);
-                buffer[i*width*3+3*j+1].image = *pixel;
+                fscanf(source, "%d ", &pixel);
+                //printf("Working on p3");
 
-                fscanf(source, "%d ",pixel);
-                buffer[i*width*3+3*j+2].image = *pixel;
+                buffer->image[i*width*3+3*j] = pixel;
+
+                fscanf(source, "%d ", &pixel);
+                buffer->image[i*width*3+3*j+1] = pixel;
+
+                fscanf(source, "%d ", &pixel);
+                buffer->image[i*width*3+3*j+2] = pixel;
 
             }
         }
@@ -129,7 +132,7 @@ int ppmConverter(char* inputFile, char* outputFile, int desiredFormat)
     return 0;
 }
 
-void pThreeORpSixOut(Pixmap *buffer, char* outputFileName, int size, int desiredFormat)
+void pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredFormat)
 {
     int i, j, numPix;
     char comment[] = {"#This was converted by Alejandro Varela"};
@@ -138,7 +141,7 @@ void pThreeORpSixOut(Pixmap *buffer, char* outputFileName, int size, int desired
     FILE *destination = fopen(outputFileName, "w");
     if (!destination)
     {
-        fprintf(stderr,"\nFile cannot be opened/created for writing!");
+        fprintf(stderr,"\nFile already Exist!!!");
     }
     else
     {
@@ -149,7 +152,7 @@ void pThreeORpSixOut(Pixmap *buffer, char* outputFileName, int size, int desired
             numPix = fwrite((void *) buffer->image, 1, (size_t) size, destination);
         }
         else if(desiredFormat == 3)
-        {
+        {   printf("doing stuff!");
             for(i=0;i<buffer->height;i++)
             {
                 for(j=0;j<buffer->width;j++)
@@ -175,6 +178,5 @@ int main(int argc, char *argv[])
     printf("Converting starting...");
     ppmConverter(argv[2], argv[3], ppmFormat);
 
-    //printf("\nConverting complete...\n");
     return 0;
 }
