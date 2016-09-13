@@ -108,7 +108,6 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
 
                 fscanf(source, "%d ", &pixel);
                 //printf("Working on p3");
-
                 buffer->image[i*width*3+3*j] = pixel;
 
                 fscanf(source, "%d ", &pixel);
