@@ -60,7 +60,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     //printf("%d", width);
 
     if(maxColor >= 65336 || maxColor <= 0){
-        fprintf(stderr,"image is not true color(8byte), read failed");
+        fprintf(stderr,"Image is not true color or 8bytes!");
         exit(-1);
     }
     // mult the size by three to account for rgb
@@ -83,7 +83,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     }
 
     if(!buffer->image){
-        perror("Cannot allocate memory for the ppm image.");
+        perror("Cannot allocate memory for the ppm image!");
     }
     //printf("\nBuffer successfully created with all stuff!\n");
     // Read the image into the buffer depending on whether it is in P6 or P3 format
@@ -93,7 +93,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
         totalItemsRead = fread((void *) buffer->image, 1, (size_t) size, source);
         if (totalItemsRead != size)
         {
-            fprintf(stderr,"cannot read image data from file \n");
+            fprintf(stderr,"Could not read the entire image! \n");
             exit(-1);
         }
 
@@ -129,7 +129,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
 
 // Takes the buffer, output file, size of image, and the desired format
 // Uses these in order to write the buffer out to the file in either P3 or P6
-void pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredFormat)
+int pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredFormat)
 {
     FILE *destination;
     int i, j, numPix;
