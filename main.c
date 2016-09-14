@@ -34,9 +34,10 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     }
 
     fscanf(source, "P%c\n", &c);
-    magicNumber = c -'0';
+    magicNumber = c -'0';// convert the magic number over to an int
+    //printf("%d", magicNumber);
     //printf("%c", c);
-    if (c != 6 || c != 3) //if not in either p6 or p3 format then exit
+    if (magicNumber != 6 && magicNumber != 3 ) //if not in either p6 or p3 format then exit
     {
         fprintf(stderr, "\nThis is not in the correct ppm format!");
         exit(-1);
@@ -84,6 +85,8 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
 
     if(!buffer->image){
         perror("\nCannot allocate memory for the ppm image!");
+        free(buffer);
+        exit(-1);
     }
     //printf("\nBuffer successfully created with all stuff!\n");
     // Read the image into the buffer depending on whether it is in P6 or P3 format
@@ -94,6 +97,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
         if (totalItemsRead != size)
         {
             fprintf(stderr,"\nCould not read the entire image! \n");
+            free(buffer);
             exit(-1);
         }
 
@@ -174,9 +178,11 @@ int pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredF
 int main(int argc, char *argv[])
 {
     int ppmFormat = atoi(argv[1]);
+    //printf("%d", ppmFormat);
+
     if(ppmFormat != 3 && ppmFormat != 6)
     {
-        fprintf(stderr, "\nI cannot convert to P%d! format\n Only P6 or P3!", ppmFormat);
+        fprintf(stderr, "I cannot convert to P%d! format\nOnly P6 or P3!", ppmFormat);
         exit(-1);
     }
 
