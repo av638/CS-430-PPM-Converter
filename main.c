@@ -29,7 +29,9 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     source = fopen (inputFile, "r");
     if(source == NULL)
     {
-        fprintf(stderr, "\nFile cannot be opened & or does not Exist!");
+        fprintf(stderr, "\nERROR: File cannot be opened & or does not Exist!");
+        fclose(source);
+        free(buffer);
         exit(-1);
     }
 
@@ -39,7 +41,9 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     //printf("%c", c);
     if (magicNumber != 6 && magicNumber != 3 ) //if not in either p6 or p3 format then exit
     {
-        fprintf(stderr, "\nThis is not in the correct ppm format!");
+        fprintf(stderr, "\nERROR: This is not in the correct ppm format!");
+        free(buffer);
+        fclose(source);
         exit(-1);
     }
 
@@ -61,7 +65,8 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     //printf("%d", width);
     //printf("%d", maxColor);
     if(maxColor > 255 || maxColor <= 0){
-        fprintf(stderr,"\nImage is not 8 bits per channel!");
+        fprintf(stderr,"\nERROR: Image is not 8 bits per channel!");
+        fclose(source);
         free(buffer);
         exit(-1);
     }
@@ -73,7 +78,8 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     // Except for the data because we just want to make sure that we allocate enough memory first.
     if(!buffer)
     {
-        fprintf(stderr, "\nCannot allocate memory for the ppm image.");
+        fprintf(stderr, "\nERROR: Cannot allocate memory for the ppm image.");
+        fclose(source);
         free(buffer);
         exit(-1);
     }
@@ -86,7 +92,8 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     }
 
     if(!buffer->image){
-        perror("\nCannot allocate memory for the ppm image!");
+        perror("\nERROR: Cannot allocate memory for the ppm image!");
+        fclose(source);
         free(buffer);
         exit(-1);
     }
@@ -98,7 +105,8 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
         totalItemsRead = fread((void *) buffer->image, 1, (size_t) size, source);
         if (totalItemsRead != size)
         {
-            fprintf(stderr,"\nCould not read the entire image! \n");
+            fprintf(stderr,"\nERROR: Could not read the entire image! \n");
+            fclose(source);
             free(buffer);
             exit(-1);
         }
@@ -145,7 +153,9 @@ int pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredF
     destination = fopen(outputFileName, "w");
     if (!destination)
     {
-        fprintf(stderr,"\nCan't open the file for writing");
+        fprintf(stderr,"\nERROR: Can't open the file for writing");
+        fclose(destination);
+        return -1;
     }
     else
     {
@@ -184,7 +194,7 @@ int main(int argc, char *argv[])
 
     if(ppmFormat != 3 && ppmFormat != 6)
     {
-        fprintf(stderr, "I cannot convert to P%d! format\nOnly P6 or P3!", ppmFormat);
+        fprintf(stderr, "ERROR: I cannot convert to P%d! format\nOnly P6 or P3!", ppmFormat);
         exit(-1);
     }
 
