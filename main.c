@@ -59,9 +59,10 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     // read in the width, height. and max color value
     fscanf(source, "%d %d %d\n", &width, &height, &maxColor);
     //printf("%d", width);
-
-    if(maxColor >= 65336 || maxColor <= 0){
-        fprintf(stderr,"\nImage is not true color or 8bytes!");
+    //printf("%d", maxColor);
+    if(maxColor > 255 || maxColor <= 0){
+        fprintf(stderr,"\nImage is not 8 bits per channel!");
+        free(buffer);
         exit(-1);
     }
     // mult the size by three to account for rgb
@@ -73,6 +74,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     if(!buffer)
     {
         fprintf(stderr, "\nCannot allocate memory for the ppm image.");
+        free(buffer);
         exit(-1);
     }
     else{
