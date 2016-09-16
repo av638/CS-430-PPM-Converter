@@ -15,7 +15,7 @@ typedef struct Pixmap
 // Open the file and figure out whether it is in proper format and how to read it
 // Read everything into the buffer and then pass the buffer into a separate function to write
 // to the output file in the desired format
-int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
+int ppmRead(char *inputFile, char *outputFile, int desiredFormat)
 {
     FILE *source;
     int magicNumber;
@@ -92,7 +92,7 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
     }
 
     if(!buffer->image){
-        perror("\nERROR: Cannot allocate memory for the ppm image!");
+        fprintf(stderr,"\nERROR: Cannot allocate memory for the ppm image!");
         fclose(source);
         free(buffer);
         exit(-1);
@@ -136,14 +136,14 @@ int ppmConverter(char *inputFile, char *outputFile, int desiredFormat)
 
     fclose(source);
     printf("\nImage has been completely read!");
-    pThreeORpSixOut(buffer, outputFile, size, desiredFormat);
+    ppmWrite(buffer, outputFile, size, desiredFormat, maxColor);
     free(buffer);
     return 0;
 }
 
 // Takes the buffer, output file, size of image, and the desired format
 // Uses these in order to write the buffer out to the file in either P3 or P6
-int pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredFormat)
+int ppmWrite(Pixmap *buffer, char *outputFileName, int size, int desiredFormat, int maxColVal)
 {
     FILE *destination;
     int i, j, numPix;
@@ -159,7 +159,7 @@ int pThreeORpSixOut(Pixmap *buffer, char *outputFileName, int size, int desiredF
     }
     else
     {
-        fprintf(destination, "P%d\n%s\n%d %d\n%d\n", desiredFormat, comment, buffer->width, buffer->height, 255);
+        fprintf(destination, "P%d\n%s\n%d %d\n%d\n", desiredFormat, comment, buffer->width, buffer->height, maxColVal);
         // Print out to the outfile in P6 format
         if(desiredFormat == 6)
         {
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
     }
 
     printf("Converting starting...");
-    ppmConverter(argv[2], argv[3], ppmFormat);
+    ppmRead(argv[2], argv[3], ppmFormat);
     printf("\nImage has been Converted!");
 
     return 0;
